@@ -27,11 +27,19 @@ class App(tk.Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ym = yandex_music.Client(TOKEN)
-        self.time_update_ms = 1000
 
+        self.time_update_ms = 1000
+        if os.getenv('TIMEOUT_UPDATE'):
+            try:
+                self.time_update_ms = int(os.getenv('TIMEOUT_UPDATE'))
+            except ValueError:
+                print('TIMEOUT_UPDATE not number.\nUsing default value.')
+
+        # Label с назаванием трека
         self.title_track_label = TitleTrack()
         self.title_track_label.pack()
 
+        # TextBox с текстом трека
         self.lyrics_text = TextLyrics()
         self.lyrics_text.pack(expand=True, fill=tk.BOTH)
 
@@ -39,9 +47,9 @@ class App(tk.Tk):
 
         self.last_track: LastTrack or None = None
 
-        self.update()
+        self.update_track()
 
-    def update(self):
+    def update_track(self):
         queues = self.ym.queues_list()
         current_queues_id = queues[0].id
         current_queues = self.ym.queue(current_queues_id)
@@ -62,7 +70,7 @@ class App(tk.Tk):
 
             self.last_track = LastTrack(index=current_track_index, queues_id=current_queues_id)
 
-        self.after(self.time_update_ms, self.update)
+        self.after(self.time_update_ms, self.update_track)
 
 
 if __name__ == '__main__':
