@@ -1,14 +1,20 @@
+import logging
+import os
+import sys
+import tkinter as tk
+
+import yandex_music
+
 from current_lyrics.text_lyrics import TextLyrics
 from current_lyrics.title_track import TitleTrack
-
-import tkinter as tk
-import logging
-import yandex_music
 
 logger = logging.getLogger('yandex_music')
 logger.setLevel(logging.ERROR)
 
-TOKEN = 'TOKEN'
+TOKEN = os.getenv('TOKEN')
+if not TOKEN:
+    print('Usage: TOKEN=token main.py')
+    sys.exit()
 
 
 class App(tk.Tk):
@@ -28,15 +34,15 @@ class App(tk.Tk):
         self.update()
 
     def update(self):
-        queues = client.queues_list()
+        queues = self.ym.queues_list()
 
         current_queues_id = queues[0].id
-        current_queues = client.queue(current_queues_id)
+        current_queues = self.ym.queue(current_queues_id)
 
         current_track_index = current_queues.current_index
         current_track_id = current_queues.tracks[current_track_index]
-        current_track = client.tracks(f'{current_track_id.track_id}:{current_track_id.album_id}')[0] \
-            if current_track_id.album_id else client.tracks(current_track_id.track_id)[0]
+        current_track = self.ym.tracks(f'{current_track_id.track_id}:{current_track_id.album_id}')[0] \
+            if current_track_id.album_id else self.ym.tracks(current_track_id.track_id)[0]
 
         self.title_track_label.set_title(current_track.title, current_track.artists[0].name)
         lyrics_text = current_track.get_supplement().lyrics
