@@ -1,16 +1,31 @@
 import json
 import os
+import typing
 
 from current_lyrics.account import Account
 
 
+class AccountNotFound(Exception):
+    pass
+
+
 class AccountList:
     def __init__(self, filename):
+        self.accounts: typing.List[Account] = list()
+
         self.filename = filename
         if os.path.exists(self.filename):
-            pass
+            self._read()
 
-        self.accounts = list()
+    def get_token(self, login: str) -> str:
+        for account in self.accounts:
+            if account.login == login:
+                return account.token
+
+        raise AccountNotFound
+
+    def get_list_name_account(self) -> typing.List[str]:
+        return [i.login for i in self.accounts]
 
     def add(self, login, token):
         self.accounts.append(Account(login, token=token))
@@ -18,7 +33,7 @@ class AccountList:
     def add_by_password(self, login, password):
         self.accounts.append(Account(login, password=password))
 
-    def to_list(self):
+    def to_list(self) -> typing.List[dict]:
         return [i.to_dict() for i in self.accounts]
 
     def save(self):
@@ -35,3 +50,6 @@ class AccountList:
                 print('Invalid config file')
             except KeyError:
                 print('Invalid config file')
+
+    def __len__(self):
+        return len(self.accounts)

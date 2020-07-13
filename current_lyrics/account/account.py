@@ -8,7 +8,7 @@ class Account:
             self.token = token
         elif password:
             ym = Client()
-            ym.generate_token_by_username_and_password(login, password)
+            self.token = ym.generate_token_by_username_and_password(login, password)
         else:
             raise ValueError()
 
