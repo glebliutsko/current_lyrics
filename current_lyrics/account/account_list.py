@@ -29,11 +29,11 @@ class AccountList:
         """Список login'ов всех аккаунтов"""
         return [i.login for i in self.accounts]
 
-    def add(self, login, token):
-        """Добавляет аккаунт по login и token"""
+    def add(self, login: str, token: str):
+        """Добавляет аккаунт по логину (login) и токену (token)"""
         self.accounts.append(Account(login, token=token))
 
-    def add_by_password(self, login, password):
+    def add_by_password(self, login: str, password: str):
         """Добавляет аккаунт по логину (login) и паролю (password)"""
         self.accounts.append(Account(login, password=password))
 
