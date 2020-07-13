@@ -6,6 +6,7 @@ class TextLyrics(tk.Text):
         super().__init__(state=tk.DISABLED)
 
     def update_lyrics(self, lyrics: str):
+        """Обновляет текст"""
         self.configure(state=tk.NORMAL)
         self.delete('0.0', tk.END)
         self.insert(tk.END, lyrics)

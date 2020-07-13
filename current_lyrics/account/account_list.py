@@ -18,6 +18,7 @@ class AccountList:
             self._read()
 
     def get_token(self, login: str) -> str:
+        """Возвращает токен для аккаунта с логином == login"""
         for account in self.accounts:
             if account.login == login:
                 return account.token
@@ -25,22 +26,27 @@ class AccountList:
         raise AccountNotFound
 
     def get_list_name_account(self) -> typing.List[str]:
+        """Список login'ов всех аккаунтов"""
         return [i.login for i in self.accounts]
 
     def add(self, login, token):
+        """Добавляет аккаунт по login и token"""
         self.accounts.append(Account(login, token=token))
 
     def add_by_password(self, login, password):
+        """Добавляет аккаунт по логину (login) и паролю (password)"""
         self.accounts.append(Account(login, password=password))
 
     def to_list(self) -> typing.List[dict]:
         return [i.to_dict() for i in self.accounts]
 
     def save(self):
+        """Сохраняет в файл"""
         with open(self.filename, 'w') as f:
             json.dump(self.to_list(), f, indent=0)
 
     def _read(self):
+        """Читает файл"""
         with open(self.filename, 'r') as f:
             try:
                 parsed_json = json.load(f)

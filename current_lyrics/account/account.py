@@ -7,6 +7,7 @@ class Account:
         if token:
             self.token = token
         elif password:
+            # Получение токена
             ym = Client()
             self.token = ym.generate_token_by_username_and_password(login, password)
         else:
