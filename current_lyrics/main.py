@@ -3,6 +3,7 @@ import tkinter as tk
 import typing
 
 import yandex_music
+import yandex_music.exceptions
 
 from current_lyrics.text_lyrics import TextLyrics
 from current_lyrics.title_track import TitleTrack
@@ -79,36 +80,61 @@ class App(tk.Tk):
     def update_track(self):
         """Обновляет слова в self.lyrics_text"""
         if self.ym is not None:
-            # Получение всех очередей.
-            queues = self.ym.queues_list()
-            # Последняя обновленная очередь всегда самая первая в списке.
-            current_queues_id = queues[0].id
+            def get_current_queues() -> typing.Tuple[str, 'yandex_music.Queue']:
+                """Получает текущую очередь"""
+                current_queue = current_queues_id = None
+                while not current_queue:
+                    # Получение всех очередей.
+                    queues = self.ym.queues_list()
+                    # Последняя обновленная очередь всегда самая первая в списке.
+                    current_queues_id = queues[0].id
 
-            # Получаем полную информацию о очереде.
-            current_queues = self.ym.queue(current_queues_id)
-            current_track_index = current_queues.current_index
+                    # Иногда, очередь может обновится между получением списка очередей и получением полной информации
+                    # о ней. Если это произошло, то повторяем получение ID.
+                    try:
+                        # Получаем полную информацию о очереде.
+                        current_queue = self.ym.queue(current_queues_id)
+                    except yandex_music.exceptions.BadRequest:
+                        pass
 
-            # Проверяем, переключился ли трек
-            if not self.last_track or \
-                    (self.last_track.index != current_track_index or self.last_track.queues_id != current_queues_id):
-                # Получаем сокращенную информацию о треке
-                current_track_short = current_queues.tracks[current_track_index]
-                # Формируем полный ID в формате 'track_id:album_id' и получаем полную информацию о треке
-                current_track = self.ym.tracks(f'{current_track_short.track_id}:{current_track_short.album_id}')[0] \
-                    if current_track_short.album_id else self.ym.tracks(current_track_short.track_id)[0]
+                return current_queues_id, current_queue
 
-                # Обновляем название трека в окне
-                self.title_track_label.set_title(current_track.title, current_track.artists[0].name)
+            def get_new_track_data(track_id):
+                """Получение информации (исполнитель, название, слова) о новом треке."""
+                current_track = self.ym.tracks(track_id)[0]
 
-                lyrics_text = current_track.get_supplement().lyrics
-                if lyrics_text:
-                    self.lyrics_text.update_lyrics(lyrics_text.full_lyrics)
+                lyrics = current_track.get_supplement().lyrics
+                if lyrics:
+                    lyrics_text = lyrics.full_lyrics
                 else:
-                    self.lyrics_text.update_lyrics('Слова не найдены')
+                    lyrics_text = 'Слова не найдены'
 
-                self.last_track = LastTrack(index=current_track_index, queues_id=current_queues_id)
+                return current_track.title, current_track.artists[0].name, lyrics_text
 
-        self.after(self.time_update_ms, self.update_track)
+            try:
+                current_queues_id, current_queue = get_current_queues()
+                current_track_index = current_queue.current_index
+
+                # Проверяем, переключился ли трек
+                if not self.last_track or \
+                        (self.last_track.index != current_track_index or self.last_track.queues_id != current_queues_id):
+                    # Получаем сокращенную информацию о треке
+                    current_track_short = current_queue.tracks[current_track_index]
+
+                    # Формируем ID трека в формате 'track_id:album_id'
+                    track_id = current_track_short.track_id
+                    if current_track_short.album_id:
+                        track_id += f':{current_track_short.album_id}'
+
+                    title, artists, lyrics = get_new_track_data(track_id)
+
+                    # Обновляем информацию треке в окне
+                    self.title_track_label.set_title(title, artists)
+                    self.lyrics_text.update_lyrics(lyrics)
+
+                    self.last_track = LastTrack(index=current_track_index, queues_id=current_queues_id)
+            finally:
+                self.after(self.time_update_ms, self.update_track)
 
 
 if __name__ == '__main__':
