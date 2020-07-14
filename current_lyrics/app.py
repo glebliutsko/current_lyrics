@@ -1,18 +1,10 @@
-import logging
 import tkinter as tk
 import typing
 
 import yandex_music
 import yandex_music.exceptions
 
-from current_lyrics.text_lyrics import TextLyrics
-from current_lyrics.title_track import TitleTrack
-from current_lyrics.account_menu import AccountMenu
-from current_lyrics.add_account_window import AddAccountWindow
-from current_lyrics.account import AccountList
-
-logger = logging.getLogger('yandex_music')
-logger.setLevel(logging.ERROR)
+from current_lyrics import TextLyrics, TitleTrack, AccountMenu, AddAccountWindow, AccountList
 
 
 class LastTrack(typing.NamedTuple):
@@ -135,8 +127,3 @@ class App(tk.Tk):
                     self.last_track = LastTrack(index=current_track_index, queues_id=current_queues_id)
             finally:
                 self.after(self.time_update_ms, self.update_track)
-
-
-if __name__ == '__main__':
-    app = App()
-    app.mainloop()
