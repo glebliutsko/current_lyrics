@@ -17,7 +17,7 @@ def requirements():
 
 
 setup(
-    name="current_lyrics",
+    name="yandexlyrics",
     version="0.1",
     author="Gleb Liutsko",
     author_email="gleb290303@gmail.com",
@@ -30,5 +30,5 @@ setup(
         "git+https://github.com/MarshalX/yandex-music-api.git@134f3bcf0d68418dc14904cf165660c0a1d0eaca#egg=yandex-music"
     ],
     packages=find_packages(),
-    entry_points={"console_scripts": ["current_lyrics=current_lyrics.__main__:main"]}
+    entry_points={"console_scripts": ["yandexlyrics=yandexlyrics.__main__:main"]}
 )

@@ -2,7 +2,7 @@ import json
 import os
 import typing
 
-from current_lyrics.account import Account
+from yandexlyrics.account import Account
 
 
 class AccountNotFound(Exception):

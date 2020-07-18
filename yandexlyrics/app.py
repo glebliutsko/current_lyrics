@@ -4,7 +4,7 @@ import typing
 import yandex_music
 import yandex_music.exceptions
 
-from current_lyrics import TextLyrics, TitleTrack, AccountMenu, AddAccountWindow, AccountList
+from yandexlyrics import TextLyrics, TitleTrack, AccountMenu, AddAccountWindow, AccountList
 
 
 class LastTrack(typing.NamedTuple):

@@ -2,7 +2,7 @@ import tkinter as tk
 
 import typing
 
-from current_lyrics.account import AccountList
+from yandexlyrics.account import AccountList
 
 
 class AccountMenu(tk.OptionMenu):

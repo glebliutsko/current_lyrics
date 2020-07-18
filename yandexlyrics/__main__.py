@@ -5,7 +5,7 @@ if not __package__:
     sys.path.insert(0, dirname(dirname(path)))
 
 import logging
-from current_lyrics.app import App
+from yandexlyrics.app import App
 
 
 def main():

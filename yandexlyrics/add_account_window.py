@@ -3,7 +3,7 @@ import tkinter.messagebox
 
 import yandex_music.exceptions
 
-from current_lyrics.account import AccountList
+from yandexlyrics.account import AccountList
 
 
 class AddAccountWindow(tk.Toplevel):
